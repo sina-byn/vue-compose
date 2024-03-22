@@ -1,10 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const prompts = require('prompts');
-const fetch = require('node-fetch');
 const pkgDir = require('pkg-dir');
+const prompts = require('prompts');
+// const fetch = require('node-fetch');
+
+// * data
+const composables = require('../data/composables.json');
 
 // * utils
+const logger = require('../utils/logger');
 const { toCamelCase } = require('../utils');
 
 module.exports = async (passedComposables, opts) => {
@@ -12,33 +16,31 @@ module.exports = async (passedComposables, opts) => {
   const { ts = false, output = defaultOutput } = opts;
 
   if (!fs.existsSync(output) || !fs.statSync(output).isDirectory()) {
-    console.log('invalid output directory');
-    return;
+    return logger.error('invalid output dir');
   }
 
-  const loadComposables = async () => {
-    try {
-      const response = await fetch('http://localhost:5173/sample.json');
-      const composables = await response.json();
+  // const loadComposables = async () => {
+  //   try {
+  //     const response = await fetch('http://localhost:5173/composables.json');
+  //     const composables = await response.json();
 
-      return composables[ts ? 'ts' : 'js'];
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //     return composables[ts ? 'ts' : 'js'];
+  //   } catch (err) {
+  //     logger.error(err);
+  //   }
+  // };
 
-  const composables = await loadComposables();
+  // const composables = await loadComposables();
   const ext = ts ? 'ts' : 'js';
 
   const writeComposable = composable => {
-    const code = composables[composable];
+    // const code = composables[composable];
+    const code = composables[ext][composable];
     const filename = `${composable}.${ext}`;
     const outputPath = path.join(output, filename);
 
-    if (fs.existsSync(outputPath)) {
-      console.error('already exists');
-      return;
-    }
+    if (fs.existsSync(outputPath))
+      return logger.error(composable, 'already exists');
 
     fs.writeFileSync(outputPath, code, 'utf-8');
   };
@@ -69,14 +71,10 @@ module.exports = async (passedComposables, opts) => {
     },
   ];
 
-  //   const onCancel = prompt => {
-  //     console.log('Never stop prompting!');
-  //     return true;
-  //   };
+  const { composables: selectedComposables } = await prompts(questions);
 
-  const { composables: selectedComposables } = await prompts(questions, {
-    // onCancel,
-  });
+  if (!selectedComposables || !selectedComposables.length)
+    return logger.error('no composables were selected');
 
   selectedComposables.forEach(writeComposable);
 };

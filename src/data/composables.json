@@ -1,0 +1,8 @@
+{
+  "ts": {
+    "useSynced": "this is ts code"
+  },
+  "js": {
+    "useSynced": "this is js code"
+  }
+}
