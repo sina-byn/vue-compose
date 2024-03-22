@@ -1,8 +1,10 @@
 {
   "ts": {
-    "useSynced": "this is ts code"
+    "useSynced": "this is the ts code for the use-synced composable",
+    "useMouse": "this is the ts code for the use-mouse composable"
   },
   "js": {
-    "useSynced": "this is js code"
+    "useSynced": "this is the js code for the use-synced composable",
+    "useMouse": "this is the js code for the use-mouse composable"
   }
 }
